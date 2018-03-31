@@ -1,0 +1,83 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>编译器</title>
+<link href="../css/index.css" rel="stylesheet"/>
+<script type="text/javascript" data-main="../js/main" src="../js/require/require.js" async="async"></script>
+</head>
+<body>
+	<div class="menubar">
+	<input style="display: none" type="file" id="file" onchange="moduleIndex.readFile()"/>
+		<ul class="file-men">
+			<li>
+				<a href="#" id="filemenu">文件</a>
+				<ul id="file-child-men">
+					<li onclick="moduleIndex.importFile()">打开</li>
+					<li onClick="moduleIndex.saveFile()" class="save" disabled="true">保存</li>
+					<li onClick="moduleIndex.saveFileAs()" class="save">另存为</li>
+					<li>退出</li>
+				</ul>
+			</li>
+			<li>
+				<a href="#" id="worldsanlymenu">词法分析</a>
+				<ul id="worldsanly-child-men">
+					<li onClick="moduleIndex.analyse()">手工生成过程演示</li>
+					<li onClick="moduleIndex.analyse()">自动生成算法演示</li>
+				</ul>
+			</li>
+			<li><a href="#">语法分析</a></li>
+			<li><a href="#">中间代码生成</a></li>
+			<li><a href="#">目标代码生成</a></li>
+			<li><a href="#">帮助</a></li>
+		</ul>
+	</div>
+	<div class="container">
+		<div class="item file-context">
+			<div>
+				<div class="tabcard">源码区</div>
+				<div class="source-title" id="filename">
+				</div>
+				<div style="clear: both;"></div>
+			</div>
+			<textarea id="code"></textarea>
+		</div>
+		<div class="item token-context">
+			<div><div class="tabcard">TOKEN</div><div style="clear: both;"></div></div>
+			<div style="height: 90%;overflow:scroll">
+				<table border="1" style="height: 90%;">
+					<thead><tr><td>token</td><td>行号</td><td>列号</td><td>种别码</td></tr></thead>
+					<tbody id="tokentable"><tr class = "default-mes"><td colspan="4">暂无信息</td></tr></tbody>
+					<tfoot></tfoot>
+				</table>
+			</div>
+		</div>
+		<div class="item symbol-context">
+			<div><div class="tabcard">符号表</div><div style="clear: both;"></div></div>
+			<div style="height: 90%;overflow:scroll">
+				<table border="1" style="height: 90%;">
+					<thead><tr><td>符号</td><td>长度</td><td>TYPE</td><td>种别码</td></tr></thead>
+					<tbody id="symboltable">
+						<tr class = "default-mes"><td colspan="4">暂无信息</td></tr>
+					</tbody>
+					<tfoot></tfoot>
+				</table>
+			</div>
+		</div>
+		<div class="item error-context">
+			<div><div class="tabcard">错误区</div><div style="clear: both;"></div></div>
+			<div style="height: 90%;overflow:scroll">
+				<table border="1">
+					<thead><tr><td>错误信息</td></tr></thead>
+					<tbody id="erotable">
+						<tr class = "default-mes" style="height:226px"><td>暂无信息</td></tr>
+					</tbody>
+					<tfoot></tfoot>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

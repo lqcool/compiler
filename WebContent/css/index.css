@@ -1,0 +1,177 @@
+body {
+	background: gainsboro;
+	overflow: hidden;
+}
+
+.menubar {
+	/* height: 30px; */
+	/* border: 1px solid gray; */
+	
+}
+
+textarea {
+	width: 100% !important;
+	background-color: #fff7f7; /* #373737; */
+	height: 90%;
+	padding-top: 10px;
+	padding-right: 10px;
+	padding-left: 10px;
+	padding-bottom: 10px;
+	overflow: auto;
+	color: green;
+	font-size: 16px;
+	resize: none;
+	border: none;
+}
+
+.container {
+	display: flex;
+	flex-flow: row wrap;
+	height: 93.83%;
+	min-width:1233px;
+	max-width: 1533px; 
+}
+
+.item {
+	flex-grow: 4;
+	height: 48%;
+	width: 42%;
+}
+
+.file-context {
+	background: white;
+	margin-right: 1%;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 60px rgba(0, 0, 0, 0.06)
+		inset;
+}
+
+.token-context {
+	background: white;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 60px rgba(0, 0, 0, 0.06)
+		inset;
+}
+
+.symbol-context {
+	background: white;
+	margin-right: 1%;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 60px rgba(0, 0, 0, 0.06)
+		inset;
+}
+
+.error-context {
+	background: white;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 60px rgba(0, 0, 0, 0.06)
+		inset;
+}
+
+.tabcard {
+	height: 25px;
+	line-height: 25px;
+	padding-left: 2%;
+	color: white;
+	width: 70px;
+	border-bottom-right-radius: 35px;
+	background: #3d7fd2;
+	font-size: 87.5%;
+	font-family: '微软雅黑';
+	font-weight: 600;
+	float: left;
+}
+
+.source-title {
+	float: left;
+	height: 10%;
+	width: 50%;
+	margin-left: 30%;
+	display: inline-block;
+}
+
+ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	background-color: #1c7959;
+}
+
+.file-men>li {
+	float: left;
+}
+
+li a, .dropbtn {
+	display: inline-block;
+	color: white;
+	text-align: center;
+	padding: 5px 16px;
+	text-decoration: none;
+}
+
+#file-child-men {
+	display: none;
+	background-color: #f9f9f9;
+	font-size: 12px;
+	position: absolute;
+	min-width: 100px;
+	min-height: 150px;
+	width: 120px;
+	box-shadow: 12px 8px 16px 0px rgba(0, 0, 0, 0.2);
+	border-radius: 5px;
+}
+
+#file-child-men li {
+	display: block;
+	padding-left: 13px;
+	cursor: pointer;
+	height: 34px;
+	line-height: 34px;
+}
+
+#file-child-men li:HOVER {
+	background: #3d7fd2;
+	color: white;
+}
+
+#worldsanly-child-men {
+	display: none;
+	background-color: #f9f9f9;
+	font-size: 12px;
+	position: absolute;
+	min-width: 100px;
+	min-height: 150px;
+	width: 125px;
+	box-shadow: 12px 8px 16px 0px rgba(0, 0, 0, 0.2);
+	border-radius: 5px;
+}
+
+#worldsanly-child-men li {
+	display: block;
+	cursor: pointer;
+	height: 34px;
+	line-height: 34px;
+	padding-left: 13px;
+}
+
+#worldsanly-child-men li:HOVER {
+	background: #3d7fd2;
+	color: white;
+}
+
+table {
+	border: 1px solid #c7d2cf; color: #8c8cb7;
+	width: 98%;
+	margin: 0 auto;
+	margin-top: 9px;
+	border-collapse: collapse;
+}
+
+table td {
+	padding-left: 10px;
+}
+
+thead tr {
+	background: #dfffea;
+}
+
+.default-mes {
+	text-align: center;
+}
