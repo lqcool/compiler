@@ -98,12 +98,17 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 				}
 				//整数科学记数法或者小数科学记数法或者小数识别
 				if(currentLineStr.charAt(colNo) == '.' || currentLineStr.charAt(colNo) == 'e' ||  currentLineStr.charAt(colNo) == 'E'){
+					//是否是小数
+					let canBeDecimal = false;
+					let isRightDecimal = false;
 					if(currentLineStr.charAt(colNo) == '.'){
+						canBeDecimal = true;
 						cwd += ".";
 						colNo ++;
 					}
 					//数字阶段
 					while(colNo < currentLineStrSize && currentLineStr.charAt(colNo) >= '0' && currentLineStr.charAt(colNo) <= '9'){
+						isRightDecimal = true;
 						cwd += currentLineStr.charAt(colNo);
 						colNo++;
 					}
@@ -126,7 +131,7 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 							//出错
 							wordsAnalyse.errorMesAry.push("第" + (rowNo + 1) + "行第" + (colNo+1) + "列"+"请检科学记数法的正确性");
 							//跳到操作符或者正常结束的地方
-							while(colNo < len && !(isEndOfScienceNum(ch))){
+							while(colNo < currentLineStrSize && !(isEndOfScienceNum(ch))){
 								colNo ++;
 								ch = currentLineStr.charAt(colNo);
 							}
@@ -157,7 +162,7 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 							else{
 								wordsAnalyse.errorMesAry.push("第" + (rowNo + 1) + "行第" + (colNo+1) + "列"+"请检科学记数法的正确性");
 								//跳到操作符或者正常结束的地方
-								while(colNo < len && !(isEndOfScienceNum(ch))){
+								while(colNo < currentLineStrSize && !(isEndOfScienceNum(ch))){
 									colNo ++;
 									ch = currentLineStr.charAt(colNo);
 								}
@@ -174,15 +179,24 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 					else{
 						ch = currentLineStr.charAt(colNo);
 						if(isEndOfScienceNum(ch)){
-							var obj = {text:cwd,rowNo:rowNo+1,colNo:colNo+1,code:102};
-							wordsAnalyse.distinguishedWordsAry.push(obj);
+							//两个条件满足，就表明小数数字格式正确
+							if(canBeDecimal && isRightDecimal){
+								var obj = {text:cwd,rowNo:rowNo+1,colNo:colNo+1,code:102};
+								wordsAnalyse.distinguishedWordsAry.push(obj);
+							}else{
+								//跳到操作符或者正常结束的地方
+								while(colNo < currentLineStrSize && !(isEndOfScienceNum(ch))){
+									colNo ++;
+									ch = currentLineStr.charAt(colNo);
+								}
+							}
 							break;
 						}
 						else{
 							//出错
 							wordsAnalyse.errorMesAry.push("第" + (rowNo + 1) + "行第" + (colNo+1) + "列"+"请检小数的正确性");
 							//跳到操作符或者正常结束的地方
-							while(colNo < len && !(isEndOfScienceNum(ch))){
+							while(colNo < currentLineStrSize && !(isEndOfScienceNum(ch))){
 								colNo ++;
 								ch = currentLineStr.charAt(colNo);
 							}
@@ -540,8 +554,10 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 				ch == ':');
 	}
 	
+	//是否是科学计数法结尾
 	function isEndOfScienceNum(ch){
 		return (
+				ch == '/n'||
 				ch == ' ' || 
 				ch =='	' || 
 				ch == ';' || 

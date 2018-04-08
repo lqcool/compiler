@@ -55,7 +55,7 @@ public class Main {
 	}
 	
 	public static void dsx(){
-		String xp = "323434";
+		String xp = "32.";
 		int colNo = 0;
 		int len = xp.length();
 		String cwd = "";
@@ -68,12 +68,17 @@ public class Main {
 				}
 				//整数科学记数法或者小数科学记数法或者小数识别
 				if(xp.charAt(colNo) == '.' || xp.charAt(colNo) == 'e' ||  xp.charAt(colNo) == 'E'){
+					//是否是小数
+					boolean canBeDecimal = false;
+					boolean isRightDecimal = false;
 					if(xp.charAt(colNo) == '.'){
+						canBeDecimal = true;
 						cwd += ".";
 						colNo ++;
 					}
 					//数字阶段
 					while(colNo < len && xp.charAt(colNo) >= '0' && xp.charAt(colNo) <= '9'){
+						isRightDecimal = true;
 						cwd += xp.charAt(colNo);
 						colNo++;
 					}
@@ -142,7 +147,18 @@ public class Main {
 					else{
 						char ch = xp.charAt(colNo);
 						if(ch == ' ' || ch=='	' || ch== ';' || ch== ',' || ch== ')' || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '!' || ch == '>' || ch == '<' || ch == '=' || ch == '%' || ch == ':'){
-							System.out.println("小数放入结果中");
+							if(canBeDecimal && isRightDecimal){
+								System.out.println("小数放入结果中");
+							}
+							else{
+								//出错
+								System.out.println("小数识别出错" + (colNo + 1) + "列");
+								//跳到操作符或者正常结束的地方
+								while(colNo < len && !(ch == ' ' || ch=='	' || ch== ';' || ch== ',' || ch== ')' || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '!' || ch == '>' || ch == '<' || ch == '=' || ch == '%' || ch == ':')){
+									colNo ++;
+									ch = xp.charAt(colNo);
+								}
+							}
 							break;
 						}
 						else{
