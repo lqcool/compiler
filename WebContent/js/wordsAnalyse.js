@@ -88,22 +88,140 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 	 */
 	function distinguishDigital(rowNo,colNo,currentLineStr,currentLineStrSize){
 		let cwd = "";
-		cwd += currentLineStr.charAt(colNo);
-		colNo++;
-		
-		while((colNo <= (currentLineStrSize - 1)) && isPartOfDigital(currentLineStr.charAt(colNo)) && currentLineStr.charAt(colNo) != ' '){
-			cwd +=  currentLineStr.charAt(colNo);
-			colNo ++;
+		let ch = "";
+		while(colNo < currentLineStrSize){
+			if(currentLineStr.charAt(colNo) >= '0' && currentLineStr.charAt(colNo) <= '9'){
+				//数字阶段
+				while(colNo < currentLineStrSize && currentLineStr.charAt(colNo) >= '0' && currentLineStr.charAt(colNo) <= '9'){
+					cwd += currentLineStr.charAt(colNo);
+					colNo++;
+				}
+				//整数科学记数法或者小数科学记数法或者小数识别
+				if(currentLineStr.charAt(colNo) == '.' || currentLineStr.charAt(colNo) == 'e' ||  currentLineStr.charAt(colNo) == 'E'){
+					if(currentLineStr.charAt(colNo) == '.'){
+						cwd += ".";
+						colNo ++;
+					}
+					//数字阶段
+					while(colNo < currentLineStrSize && currentLineStr.charAt(colNo) >= '0' && currentLineStr.charAt(colNo) <= '9'){
+						cwd += currentLineStr.charAt(colNo);
+						colNo++;
+					}
+					//科学记数法
+					if(colNo < currentLineStrSize && (currentLineStr.charAt(colNo) == 'E' || currentLineStr.charAt(colNo) == 'e')){
+						cwd += currentLineStr.charAt(colNo);
+						colNo++;
+						//表示E或者e后面是否有数字
+						let hasNumAfterE = false;
+						//数字阶段
+						while(colNo < currentLineStrSize && currentLineStr.charAt(colNo) >= '0' && currentLineStr.charAt(colNo) <= '9'){
+							//e或者E后面有数字，在当前情况下，还是正确的
+							hasNumAfterE = true;
+							cwd += currentLineStr.charAt(colNo);
+							colNo++;
+						}
+						//如果e或者E后面没有数字，那么表示当前不能组成一个正确的科学记数法，报错处理
+						if(!hasNumAfterE){
+							ch = currentLineStr.charAt(colNo);
+							//出错
+							wordsAnalyse.errorMesAry.push("第" + (rowNo + 1) + "行第" + (colNo+1) + "列"+"请检科学记数法的正确性");
+							//跳到操作符或者正常结束的地方
+							while(colNo < len && !(isEndOfScienceNum(ch))){
+								colNo ++;
+								ch = currentLineStr.charAt(colNo);
+							}
+							break;
+						}
+						//识别科学记数法中的+
+						if(currentLineStr.charAt(colNo) == '+' || currentLineStr.charAt(colNo) == '-'){
+							cwd += currentLineStr.charAt(colNo);
+							colNo++;
+						}
+						//识别科学记数法中+号后面的数字
+						//数字阶段
+						while(colNo < currentLineStrSize && currentLineStr.charAt(colNo) >= '0' && currentLineStr.charAt(colNo) <= '9'){
+							//e或者E后面有数字，在当前情况下，还是正确的
+							cwd += currentLineStr.charAt(colNo);
+							colNo++;
+						}
+						//存在表达式，判定以后结束
+						if(colNo != currentLineStrSize){
+							ch = currentLineStr.charAt(colNo);
+							//表示double 5.4E ; 或者double x = 5E+3/4E-2 或者 5E-2*2E+2等等
+							if(isEndOfScienceNum(ch)){
+								//科学记数法识别完成，填入结果中
+								var obj = {text:cwd,rowNo:rowNo+1,colNo:colNo+1,code:106};
+								wordsAnalyse.distinguishedWordsAry.push(obj);
+								break;
+							}
+							else{
+								wordsAnalyse.errorMesAry.push("第" + (rowNo + 1) + "行第" + (colNo+1) + "列"+"请检科学记数法的正确性");
+								//跳到操作符或者正常结束的地方
+								while(colNo < len && !(isEndOfScienceNum(ch))){
+									colNo ++;
+									ch = currentLineStr.charAt(colNo);
+								}
+							}
+						}
+						else{
+							//小数科学记数法识别完成
+							var obj = {text:cwd,rowNo:rowNo+1,colNo:colNo+1,code:106};
+							wordsAnalyse.distinguishedWordsAry.push(obj);
+							break;
+						}
+					}
+					//小数识别完成，填入结果中
+					else{
+						ch = currentLineStr.charAt(colNo);
+						if(isEndOfScienceNum(ch)){
+							var obj = {text:cwd,rowNo:rowNo+1,colNo:colNo+1,code:102};
+							wordsAnalyse.distinguishedWordsAry.push(obj);
+							break;
+						}
+						else{
+							//出错
+							wordsAnalyse.errorMesAry.push("第" + (rowNo + 1) + "行第" + (colNo+1) + "列"+"请检小数的正确性");
+							//跳到操作符或者正常结束的地方
+							while(colNo < len && !(isEndOfScienceNum(ch))){
+								colNo ++;
+								ch = currentLineStr.charAt(colNo);
+							}
+							break;
+						}
+					}
+				}
+				//整数识别完成，填入结果中
+				else{
+					ch = currentLineStr.charAt(colNo);
+					if(isEndOfScienceNum(ch)){
+						var obj = {text:cwd,rowNo:rowNo+1,colNo:colNo+1,code:101};
+						wordsAnalyse.distinguishedWordsAry.push(obj);
+						break;
+					}
+					else{
+						//出错
+						wordsAnalyse.errorMesAry.push("第" + (rowNo + 1) + "行第" + (colNo+1) + "列"+"请检查整数的正确性");
+						//跳到操作符或者正常结束的地方
+						while(colNo < currentLineStrSize && !(isEndOfScienceNum(ch))){
+							colNo ++;
+							ch = currentLineStr.charAt(colNo);
+						}
+						break;
+					}
+				}
+			}
 		}
-		//如果数值紧接的是组成标识符的部分，报错处理
-//		if(isPartOfIdentifier(currentLineStr.charAt(colNo - 1))){
-//			
+//		cwd += currentLineStr.charAt(colNo);
+//		colNo++;
+//		var state = 0;
+//		while((colNo <= (currentLineStrSize - 1)) && isPartOfDigital(currentLineStr.charAt(colNo)) && currentLineStr.charAt(colNo) != ' '){
+//			cwd +=  currentLineStr.charAt(colNo);
+//			colNo ++;
 //		}
-//		else{}
-		//识别完成，放入数字
-		var obj = {text:cwd,rowNo:rowNo+1,colNo:colNo+1,code:101};
-		wordsAnalyse.distinguishedWordsAry.push(obj);
-		return colNo;
+//		//识别完成，放入数字
+//		var obj = {text:cwd,rowNo:rowNo+1,colNo:colNo+1,code:101};
+//		wordsAnalyse.distinguishedWordsAry.push(obj);
+//		return colNo;
 	}
 	
 	/**
@@ -281,13 +399,13 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 					type = "常整数";
 				}
 				if(value["code"] == 103){
-					type = "字符常量";
+					type = "字符串常量";
 				}
 				if(value["code"] == 104){
 					type = "布尔常量";
 				}
 				if(value["code"] == 105){
-					type = "字符串常量";
+					type = "字符常量";
 				}
 				var tmoj = {text:value["text"],length:value["text"].length,type:type,code:value["code"]}
 				tempAry.push(tmoj);
@@ -311,24 +429,6 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 		wordsAnalyse.errorMesAry = [];
 		document.getElementById("tokentable").innerHTML = "";
 		document.getElementById("symboltable").innerHTML = "";
-	}
-	
-	//验证字符串是否是数字
-	function checkNumber(num) {
-	  var reg = /^[0-9]+.?[0-9]*$/;
-	  if (reg.test(num)) {
-	    return true;
-	  }
-	  return false;
-	}
-	
-	//验证是否为科学数字
-	function checkIfKexueJiShu(num){
-		var reg = /^((\\d+.?\\d+)[Ee]{1}(\\d+))$/;
-		if(reg.test(num)){
-			return true;
-		}
-		return false;
 	}
 	
 	/**
@@ -395,6 +495,7 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 				ch == ';');
 	}
 	
+	
 	/**
 	 * 是否为操作符的开始符
 	 */
@@ -436,6 +537,25 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 				ch == '^' ||
 				ch == '/' ||
 				ch == '?' ||
+				ch == ':');
+	}
+	
+	function isEndOfScienceNum(ch){
+		return (
+				ch == ' ' || 
+				ch =='	' || 
+				ch == ';' || 
+				ch == ',' || 
+				ch == ')' || 
+				ch == '+' || 
+				ch == '-' || 
+				ch == '*' || 
+				ch == '/' || 
+				ch == '!' || 
+				ch == '>' || 
+				ch == '<' || 
+				ch == '=' || 
+				ch == '%' || 
 				ch == ':');
 	}
 	

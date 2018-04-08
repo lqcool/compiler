@@ -60,10 +60,11 @@ define([],function(){
 	//常数
 	let constants = [
 	                   {text:"整数常量",code:"101"},
-	                   //{text:"常实数",code:"102"},
+	                   {text:"小数常量",code:"102"},
 	                   {text:"字符串常量",code:"103"},
 	                   {text:"布尔常量",code:"104"},
-	                   {text:"字符常量",code:"105"}
+	                   {text:"字符常量",code:"105"},
+	                   {text:"科学记数常量",code:"106"},
 	                   ];
 	//界符
 	let boundarys = [
