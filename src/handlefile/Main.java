@@ -55,7 +55,7 @@ public class Main {
 	}
 	
 	public static void dsx(){
-		String xp = "32.";
+		String xp = "32.;";
 		int colNo = 0;
 		int len = xp.length();
 		String cwd = "";
