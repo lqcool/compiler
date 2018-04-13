@@ -116,6 +116,11 @@ define(["wordsCodes","eleUtil","distinguishUtil"],function(wordsCodes,eleUtil,di
 						cwd += currentLineStr.charAt(colNo);
 						colNo++;
 					}
+					if(canBeDecimal === true && isRightDecimal === false){
+						//出错
+						colNo = handDigitalEro(rowNo,colNo,currentLineStr,currentLineStrSize,"小数识别出错");
+						break;
+					}
 					//科学记数法
 					if(colNo < currentLineStrSize && (currentLineStr.charAt(colNo) == 'E' || currentLineStr.charAt(colNo) == 'e')){
 						cwd += currentLineStr.charAt(colNo);
@@ -365,6 +370,7 @@ define(["wordsCodes","eleUtil","distinguishUtil"],function(wordsCodes,eleUtil,di
 	 * 生成token表
 	 */
 	function createTokenTable(){
+		console.log(wordsAnalyse.distinguishedWordsAry);
 		eleUtil.insert(document.getElementById("tokentable"),wordsAnalyse.distinguishedWordsAry);
 	}
 	
@@ -404,6 +410,7 @@ define(["wordsCodes","eleUtil","distinguishUtil"],function(wordsCodes,eleUtil,di
 				tempAry.push(tmoj);
 			}
 		}
+		console.log(tempAry);
 		eleUtil.insert(document.getElementById("symboltable"),tempAry);
 	}
 	

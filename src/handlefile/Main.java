@@ -3,13 +3,34 @@ package handlefile;
 public class Main {
 
 	public static void main(String[] args) {
+		//正确的字符串常量
 		String word = "pu cc void mai（）n9 () Str{ing ar}gs () DDD";
-		String sss = "\n";
-		//String cwd = "";
+		//错误的字符串常量
+		String word2 = "234343242432";
+		//正确的标识符
 		String sp_3x3 = "";
-		double x = 4.5E-223+23E+3;
-		double v = 6E+2;
-		
+		//错误的标识符
+		//String idenfifer!;
+		//正确的整数
+		int inte1 = 12343;
+		//错误的整数
+		int inte2 = 234dde4;
+		//正确的小数
+		double flat1 = 124.342;
+		//错误的小数
+		double flat2 = 23.234.23;
+		//正确的科学记数法
+		double flex1 = 12E+3;
+		double flex2 = 23.234E-3;
+		double flex3 = 234E23;
+		double flex4 = 234.34E23;
+		//表达式
+		double biaoda = 4.5E-223+23E+3;
+		//错误的科学记数法
+		double flex5 = 23.E+3;
+		double flex6 = 23.E3;
+		double flex7 = 23.234.E4;
+		double flex8 = 23D+4;
 //		for(int i = 0; i <= word.length() - 1; i ++){
 //			while(i <= (word.length() - 1) && word.charAt(i) != ' '){
 //				//数字
@@ -194,16 +215,6 @@ public class Main {
 		
 		System.out.println(cwd);
 	}
-	
-	public static boolean isBiaoZhiFu(){
-		double x = 3%4 ;
-		double pp = 3.4E5,xx = 4.5E8	;
-		//double g  = 4:3;
-		double dd = 5E3 + 3;
-		int t = (4>3)?3:4;
-		return (1>2);
-	}
-	
 	
 	/**
 	 * TODO:是否为数字
