@@ -28,8 +28,8 @@ textarea {
 	display: flex;
 	flex-flow: row wrap;
 	height: 93.83%;
-	min-width:1233px;
-	max-width: 1533px; 
+/* 	min-width:1233px;
+	max-width: 1533px;  */
 }
 
 .item {

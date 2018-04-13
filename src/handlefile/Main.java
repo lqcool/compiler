@@ -10,7 +10,6 @@ public class Main {
 		double x = 4.5E-223+23E+3;
 		double v = 6E+2;
 		
-		
 //		for(int i = 0; i <= word.length() - 1; i ++){
 //			while(i <= (word.length() - 1) && word.charAt(i) != ' '){
 //				//数字

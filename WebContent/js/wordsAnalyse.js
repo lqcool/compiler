@@ -1,11 +1,8 @@
-define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
+define(["wordsCodes","eleUtil","distinguishUtil"],function(wordsCodes,eleUtil,distinguishUtil){
 	var wordsAnalyse = {};
 	//存放源代码，每一项表示一行
 	wordsAnalyse.sourceCodeLines = [];
 	//识别出的保留字
-	//wordsAnalyse.distinguishedReserved = new Map();
-	//识别出的字符分类Map
-	//wordsAnalyse.distinguishedWordsMap = new Map();
 	wordsAnalyse.distinguishedWordsAry = [];
 	//识别出的错误Map
 	wordsAnalyse.errorMesAry = [];
@@ -48,7 +45,7 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 				//分析每一行
 				for(let i = count; i < currentLineStrSize;){
 					//实数
-					if(isDigital(currentLineStr.charAt(i))){
+					if(distinguishUtil.isDigital(currentLineStr.charAt(i))){
 						i = distinguishDigital(j,i,currentLineStr,currentLineStrSize);
 					}
 					//识别字符串常量和字符常量
@@ -56,15 +53,15 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 						i = distinguishConstStr(j,i,currentLineStr,currentLineStrSize);
 					}
 					//识别标识符
-					else if(isPartOfIdentifier(currentLineStr.charAt(i))){
+					else if(distinguishUtil.isPartOfIdentifier(currentLineStr.charAt(i))){
 						i = distinguishIdentifier(j,i,currentLineStr,currentLineStrSize);
 					}
 					//边界符
-					else if(isBoundaryChar(currentLineStr.charAt(i))){
+					else if(distinguishUtil.isBoundaryChar(currentLineStr.charAt(i))){
 						i = distinguishBoundaryChar(j,i,currentLineStr,currentLineStrSize);
 					}
 					//识别运算符
-					else if(isBeginOperator(currentLineStr.charAt(i))){
+					else if(distinguishUtil.isBeginOperator(currentLineStr.charAt(i))){
 						var t = distinguishOperator(j,i,currentLineStr,currentLineStrSize);
 						var s = new Number(t).toLocaleString();
 						if(s == "NaN"){
@@ -95,6 +92,13 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 				while(colNo < currentLineStrSize && currentLineStr.charAt(colNo) >= '0' && currentLineStr.charAt(colNo) <= '9'){
 					cwd += currentLineStr.charAt(colNo);
 					colNo++;
+				}
+				//首个字符为0的时候，判断数字是否合法，这里只针对十进制数字
+				if(cwd.length >= 2){
+					if(cwd.charAt(0) == '0'){
+						colNo = handDigitalEro(rowNo,colNo,currentLineStr,currentLineStrSize,"数法识别出错");
+						break;
+					}
 				}
 				//整数科学记数法或者小数科学记数法或者小数识别
 				if(currentLineStr.charAt(colNo) == '.' || currentLineStr.charAt(colNo) == 'e' ||  currentLineStr.charAt(colNo) == 'E'){
@@ -130,11 +134,6 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 							cwd += currentLineStr.charAt(colNo);
 							colNo++;
 						}
-						//识别科学记数法中的+
-						/*if(currentLineStr.charAt(colNo) == '+' || currentLineStr.charAt(colNo) == '-'){
-							cwd += currentLineStr.charAt(colNo);
-							colNo++;
-						}*/
 						//如果e或者E后面没有数字，那么表示当前不能组成一个正确的科学记数法，报错处理
 						if(!hasNumAfterE){
 							ch = currentLineStr.charAt(colNo);
@@ -142,13 +141,6 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 							colNo = handDigitalEro(rowNo,colNo,currentLineStr,currentLineStrSize,"科学计数法识别出错");
 							break;
 						}
-						//识别科学记数法中+号后面的数字
-						//数字阶段
-//						while(colNo < currentLineStrSize && currentLineStr.charAt(colNo) >= '0' && currentLineStr.charAt(colNo) <= '9'){
-//							//e或者E后面有数字，在当前情况下，还是正确的
-//							cwd += currentLineStr.charAt(colNo);
-//							colNo++;
-//						}
 						//存在表达式，判定以后结束
 						if(colNo != currentLineStrSize){
 							var xp = currentLineStr.charAt(--colNo) === '+';
@@ -161,7 +153,7 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 							++colNo;
 							ch = currentLineStr.charAt(colNo);
 							//表示double 5.4E ; 或者double x = 5E+3/4E-2 或者 5E-2*2E+2等等
-							if(isEndOfScienceNum(ch)){
+							if(distinguishUtil.isEndOfScienceNum(ch)){
 								//科学记数法识别完成，填入结果中
 								var obj = {text:cwd,rowNo:rowNo+1,colNo:colNo+1,code:106};
 								wordsAnalyse.distinguishedWordsAry.push(obj);
@@ -182,7 +174,7 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 					//小数识别完成，填入结果中
 					else{
 						ch = currentLineStr.charAt(colNo);
-						if(isEndOfScienceNum(ch)){
+						if(distinguishUtil.isEndOfScienceNum(ch)){
 							//两个条件满足，就表明小数数字格式正确
 							if(canBeDecimal && isRightDecimal){
 								var obj = {text:cwd,rowNo:rowNo+1,colNo:colNo+1,code:102};
@@ -203,7 +195,7 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 				//整数识别完成，填入结果中
 				else{
 					ch = currentLineStr.charAt(colNo);
-					if(isEndOfScienceNum(ch)){
+					if(distinguishUtil.isEndOfScienceNum(ch)){
 						var obj = {text:cwd,rowNo:rowNo+1,colNo:colNo+1,code:101};
 						wordsAnalyse.distinguishedWordsAry.push(obj);
 						break;
@@ -216,17 +208,6 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 			}
 		}
 		return colNo;
-//		cwd += currentLineStr.charAt(colNo);
-//		colNo++;
-//		var state = 0;
-//		while((colNo <= (currentLineStrSize - 1)) && isPartOfDigital(currentLineStr.charAt(colNo)) && currentLineStr.charAt(colNo) != ' '){
-//			cwd +=  currentLineStr.charAt(colNo);
-//			colNo ++;
-//		}
-//		//识别完成，放入数字
-//		var obj = {text:cwd,rowNo:rowNo+1,colNo:colNo+1,code:101};
-//		wordsAnalyse.distinguishedWordsAry.push(obj);
-//		return colNo;
 	}
 	
 	/**
@@ -273,12 +254,12 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 		cwd += currentLineStr.charAt(colNo);
 		colNo++;
 		
-		while((colNo <= (currentLineStrSize - 1)) && (isPartOfIdentifier(currentLineStr.charAt(colNo)) || isDigital(currentLineStr.charAt(colNo))) && currentLineStr.charAt(colNo) != ' '){
+		while((colNo <= (currentLineStrSize - 1)) && (distinguishUtil.isPartOfIdentifier(currentLineStr.charAt(colNo)) || distinguishUtil.isDigital(currentLineStr.charAt(colNo))) && currentLineStr.charAt(colNo) != ' '){
 			cwd += currentLineStr.charAt(colNo);
 			colNo ++;
 		}
 		//判断当前识别出来的单词是否为保留字
-		if(isSeservedWord(cwd)){
+		if(distinguishUtil.isSeservedWord(cwd)){
 			var obj = {text:cwd,rowNo:rowNo+1,colNo:colNo+1,code:wordsCodes.keywords.get(cwd)};
 			wordsAnalyse.distinguishedWordsAry.push(obj);
 		}else {
@@ -311,6 +292,7 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 				var colIndex = colNo-1;
 				var isClose = false;
 				while(rowNo < wordsAnalyse.sourceCodeLines.length){
+					//新的一行
 					currentLineStr = wordsAnalyse.sourceCodeLines[rowNo];
 					colNo = 0;
 					//跳开空格
@@ -350,7 +332,7 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 			}
 		}
 		//操作符
-		while((colNo <= (currentLineStrSize - 1)) && currentLineStr.charAt(colNo) != ' ' && isPartOfOperator(currentLineStr.charAt(colNo))){
+		while((colNo <= (currentLineStrSize - 1)) && currentLineStr.charAt(colNo) != ' ' && distinguishUtil.isPartOfOperator(currentLineStr.charAt(colNo))){
 			cwd += currentLineStr.charAt(colNo);
 			//如果当前单操作符组成的操作符不合法，做报错处理
 			if(!wordsCodes.operators.has(cwd)){
@@ -396,12 +378,15 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 			tempMap.set(wordsAnalyse.distinguishedWordsAry[i].text,wordsAnalyse.distinguishedWordsAry[i]);
 		}
 		for(let value of tempMap.values()){
-			if(isIdentifierOrDigital(value)){
+			if(distinguishUtil.isIdentifierOrDigital(value)){
 				if(value["code"] == 130){
 					type = "标识符";
 				}
 				if(value["code"] == 101){
 					type = "常整数";
+				}
+				if(value["code"] == 102){
+					type = "小数";
 				}
 				if(value["code"] == 103){
 					type = "字符串常量";
@@ -411,6 +396,9 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 				}
 				if(value["code"] == 105){
 					type = "字符常量";
+				}
+				if(value["code"] == 106){
+					type = "科学记数法";
 				}
 				var tmoj = {text:value["text"],length:value["text"].length,type:type,code:value["code"]}
 				tempAry.push(tmoj);
@@ -437,136 +425,6 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 	}
 	
 	/**
-	 * 是否为标识符和数字
-	 */
-	function isIdentifierOrDigital(obj){
-		if(obj.code == 130 || obj.code == 101 || obj.code == 103 || obj.code == 104 || obj.code == 105){
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * 判断是否为保留字（关键字）
-	 */
-	function isSeservedWord(word){
-		//是否为保留字中的一员
-		return wordsCodes.keywords.has(word);
-	}
-	
-	/**
-	 * 是否是标识符的一部分，数字单独考虑，因为数字不能作为标识符的开头
-	 */
-	function isPartOfIdentifier(ch){
-		return (
-				(ch >= 'a' && ch <= 'z') || 
-				(ch >= 'A' && ch <= 'Z') ||
-				ch== '$' ||
-				ch== '_' );
-	}
-	
-	/**
-	 * 是否是数字的一部分
-	 */
-	function isPartOfDigital(ch){
-		return (
-				(ch >= '0' && ch <= '9') || 
-				ch == '.' || 
-				ch == "E" || 
-				ch == "e" );
-	}
-	
-	/**
-	 * 判断是否为数字
-	 */
-	function isDigital(ch){
-		return (ch>= '0' && ch<= '9');
-	}
-	
-	/**
-	 * 判断是否为界符
-	 */
-	function isBoundaryChar(ch){
-		return (
-				ch == ';' || 
-				ch == '‘' || 
-				ch == '’' || 
-				ch == '“' || 
-				ch == '”' || 
-				ch == '(' || 
-				ch == ')' || 
-				ch == '{' || 
-				ch == '}' ||
-				ch == ';');
-	}
-	
-	
-	/**
-	 * 是否为操作符的开始符
-	 */
-	function isBeginOperator(ch){
-		return (
-				ch == '=' ||
-				ch == '/' ||
-				ch == '>' ||
-				ch == '<' ||
-				ch == '+' || 
-				ch == '-' || 
-				ch == '*' || 
-				ch == '%' ||
-				ch == '.' ||
-				ch == '&' ||
-				ch == '|' ||
-				ch == '!' ||
-				ch == '~' ||
-				ch == '^');
-	}
-	/**
-	 * 是否为操作符的一部分
-	 */
-	function isPartOfOperator(ch){
-		return (
-				ch == '=' ||
-				ch == '/' ||
-				ch == '>' ||
-				ch == '<' ||
-				ch == '+' || 
-				ch == '-' || 
-				ch == '*' || 
-				ch == '%' ||
-				ch == '.' ||
-				ch == '&' ||
-				ch == '|' ||
-				ch == '!' ||
-				ch == '~' ||
-				ch == '^' ||
-				ch == '/' ||
-				ch == '?' ||
-				ch == ':');
-	}
-	
-	//是否是科学计数法结尾
-	function isEndOfScienceNum(ch){
-		return (
-				ch == '/n'||
-				ch == ' ' || 
-				ch =='	' || 
-				ch == ';' || 
-				ch == ',' || 
-				ch == ')' || 
-				ch == '+' || 
-				ch == '-' || 
-				ch == '*' || 
-				ch == '/' || 
-				ch == '!' || 
-				ch == '>' || 
-				ch == '<' || 
-				ch == '=' || 
-				ch == '%' || 
-				ch == ':');
-	}
-	
-	/**
 	 * 统一处理数字识别错误
 	 */
 	function handDigitalEro(rowNo,colNo,currentLineStr,currentLineStrSize,eroMes){
@@ -574,7 +432,7 @@ define(["wordsCodes","eleUtil"],function(wordsCodes,eleUtil){
 		wordsAnalyse.errorMesAry.push("第" + (rowNo + 1) + "行第" + (colNo+1) + "列"+eroMes);
 		ch = currentLineStr.charAt(colNo);
 		//跳到操作符或者正常结束的地方
-		while(colNo < currentLineStrSize && !(isEndOfScienceNum(ch))){
+		while(colNo < currentLineStrSize && !(distinguishUtil.isEndOfScienceNum(ch))){
 			colNo ++;
 			ch = currentLineStr.charAt(colNo);
 		}
