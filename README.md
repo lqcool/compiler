@@ -7,7 +7,7 @@
 
 **如何运行？**
 
-1. git clone  git@github.com:LQ55/compiler.git
+1. git clone  git@github.com:lqcool/compiler.git
 2. 将克隆的工程放入到工作空间，并加入到tomcat运行起来
 3. 输入 http://localhost:8081/compiler/view/index.html   （这里的端口号是自己tomcat配置的端口，我这里是8081）
 
